@@ -1,0 +1,2 @@
+su gestioneserverdelclientthread.java mettere switch case entra o crea e gestirle
+su client inviare entra o crea in maniera corretta
