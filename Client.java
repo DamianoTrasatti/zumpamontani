@@ -1,11 +1,9 @@
 import java.awt.Color;
-import java.awt.GridLayout;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.Font;
 import java.io.*;
 import java.net.*;
-
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -35,6 +33,7 @@ public class Client {
 	JPanel rightPanel;
 	JSplitPane splitPane;
 	JTextField insertNome, insertPin, insertMaxGiocatori, insertSecondiAzione, insertSecondiKick;
+	JTextField insertNomeEntra, insertPinEntra;
 	JButton btnVite1, btnVite2, btnVite3, btnVite4, btnVite5;
 
 	public Socket connetti() {
@@ -54,7 +53,7 @@ public class Client {
 		return miosocket;
 	}
 
-	public void creaInterfacciaCliente() {
+public void creaInterfacciaCliente() {
 		try {
 			finestra = new JFrame("Zompa Montani client - Entra o Crea stanza");
 			finestra.setSize(1000, 800);
@@ -65,29 +64,40 @@ public class Client {
 			leftPanel.setLayout(null);
 			leftPanel.setBackground(Color.decode("#1C6634"));
 
-			// Label Titolo principale posizionato con setBounds
+			// --- NUOVO: NOME GIOCATORE (SINISTRA) ---
+			JLabel labelNomeSx = new JLabel("Nome Giocatore:");
+			labelNomeSx.setFont(new Font("Arial", Font.PLAIN, 18));
+			labelNomeSx.setForeground(Color.BLACK);
+			labelNomeSx.setBounds(50, 65, 200, 30);
+			leftPanel.add(labelNomeSx);
+
+			insertNome = new JTextField();
+			insertNome.setBounds(50, 95, 200, 30);
+			leftPanel.add(insertNome);
+
+			// Label Titolo principale (spostato più in basso per fare spazio al nome)
 			JLabel labelCreaPartita = new JLabel("CREA UNA STANZA");
 			labelCreaPartita.setFont(new Font("Arial", Font.BOLD | Font.ITALIC, 40));
 			labelCreaPartita.setForeground(Color.BLACK);
 			labelCreaPartita.setBounds(50, 10, 400, 50);
 			leftPanel.add(labelCreaPartita);
 
-			// --- 1. CREA PIN ---
+			// --- 1. CREA PIN (coordinate Y aggiornate) ---
 			JLabel labelCreaPin = new JLabel("Crea PIN:");
 			labelCreaPin.setFont(new Font("Arial", Font.PLAIN, 18));
 			labelCreaPin.setForeground(Color.BLACK);
-			labelCreaPin.setBounds(50, 100, 200, 30);
+			labelCreaPin.setBounds(50, 160, 200, 30);
 			leftPanel.add(labelCreaPin);
 
 			insertPin = new JTextField();
-			insertPin.setBounds(50, 135, 200, 30);
+			insertPin.setBounds(50, 195, 200, 30);
 			leftPanel.add(insertPin);
 
-			// --- 2. SELEZIONA NUMERO VITE (Bottoni normali singoli) ---
+			// --- 2. SELEZIONA NUMERO VITE (coordinate Y aggiornate) ---
 			JLabel labelVite = new JLabel("Seleziona numero vite per giocatore:");
 			labelVite.setFont(new Font("Arial", Font.PLAIN, 18));
 			labelVite.setForeground(Color.BLACK);
-			labelVite.setBounds(50, 190, 400, 30);
+			labelVite.setBounds(50, 250, 400, 30);
 			leftPanel.add(labelVite);
 
 			int xInizialeBf = 50;
@@ -96,109 +106,95 @@ public class Client {
 			int step = larghezzaBottone + spazioTraBottoni; // 60 pixel di incremento per ogni bottone
 
 			btnVite1 = new JButton("1");
-			btnVite1.setBounds(xInizialeBf + 0 * step, 225, larghezzaBottone, 40);
+			btnVite1.setBounds(xInizialeBf + 0 * step, 285, larghezzaBottone, 40);
 			btnVite1.addActionListener(new ActionListener() {
-				// Override the actionPerformed() method
 				public void actionPerformed(ActionEvent e) {
 					viteSelezionate = 1;
 					btnVite1.setBackground(Color.ORANGE);
-
-					// tutti gli altri bianchi
 					setBottoniBianchi(1);
 				}
 			});
 			leftPanel.add(btnVite1);
 
 			btnVite2 = new JButton("2");
-			btnVite2.setBounds(xInizialeBf + 1 * step, 225, larghezzaBottone, 40);
+			btnVite2.setBounds(xInizialeBf + 1 * step, 285, larghezzaBottone, 40);
 			btnVite2.addActionListener(new ActionListener() {
-				// Override the actionPerformed() method
 				public void actionPerformed(ActionEvent e) {
 					viteSelezionate = 2;
 					btnVite2.setBackground(Color.ORANGE);
-
-					// tutti gli altri bianchi
 					setBottoniBianchi(2);
 				}
 			});
 			leftPanel.add(btnVite2);
 
 			btnVite3 = new JButton("3");
-			btnVite3.setBounds(xInizialeBf + 2 * step, 225, larghezzaBottone, 40);
+			btnVite3.setBounds(xInizialeBf + 2 * step, 285, larghezzaBottone, 40);
 			btnVite3.addActionListener(new ActionListener() {
-				// Override the actionPerformed() method
 				public void actionPerformed(ActionEvent e) {
 					viteSelezionate = 3;
 					btnVite3.setBackground(Color.ORANGE);
-
-					// tutti gli altri bianchi
 					setBottoniBianchi(3);
 				}
 			});
 			leftPanel.add(btnVite3);
 
 			btnVite4 = new JButton("4");
-			btnVite4.setBounds(xInizialeBf + 3 * step, 225, larghezzaBottone, 40);
+			btnVite4.setBounds(xInizialeBf + 3 * step, 285, larghezzaBottone, 40);
 			btnVite4.addActionListener(new ActionListener() {
-				// Override the actionPerformed() method
 				public void actionPerformed(ActionEvent e) {
 					viteSelezionate = 4;
 					btnVite4.setBackground(Color.ORANGE);
-
-					// tutti gli altri bianchi
 					setBottoniBianchi(4);
 				}
 			});
 			leftPanel.add(btnVite4);
 
 			btnVite5 = new JButton("5");
-			btnVite5.setBounds(xInizialeBf + 4 * step, 225, larghezzaBottone, 40);
+			btnVite5.setBounds(xInizialeBf + 4 * step, 285, larghezzaBottone, 40);
 			btnVite5.addActionListener(new ActionListener() {
-				// Override the actionPerformed() method
 				public void actionPerformed(ActionEvent e) {
 					viteSelezionate = 5;
 					btnVite5.setBackground(Color.ORANGE);
-
-					// tutti gli altri bianchi
 					setBottoniBianchi(5);
 				}
 			});
 			leftPanel.add(btnVite5);
 
-			// --- 3. MASSIMO NUMERO GIOCATORI ---
+			// --- 3. MASSIMO NUMERO GIOCATORI (coordinate Y aggiornate) ---
 			JLabel labelMaxGiocatori = new JLabel("Massimo numero giocatori:");
 			labelMaxGiocatori.setFont(new Font("Arial", Font.PLAIN, 18));
 			labelMaxGiocatori.setForeground(Color.BLACK);
-			labelMaxGiocatori.setBounds(50, 290, 400, 30);
+			labelMaxGiocatori.setBounds(50, 350, 400, 30);
 			leftPanel.add(labelMaxGiocatori);
 
 			insertMaxGiocatori = new JTextField();
-			insertMaxGiocatori.setBounds(50, 325, 200, 30);
+			insertMaxGiocatori.setBounds(50, 385, 200, 30);
 			leftPanel.add(insertMaxGiocatori);
 
-			// --- 4. SECONDI AZIONE E SECONDI KICK (Sulla stessa riga) ---
+			// --- 4. SECONDI AZIONE E SECONDI KICK (coordinate Y aggiornate) ---
 			JLabel labelSecondiAzione = new JLabel("Secondi azione:");
 			labelSecondiAzione.setFont(new Font("Arial", Font.PLAIN, 18));
 			labelSecondiAzione.setForeground(Color.BLACK);
-			labelSecondiAzione.setBounds(50, 380, 180, 30);
+			labelSecondiAzione.setBounds(50, 440, 180, 30);
 			leftPanel.add(labelSecondiAzione);
 
 			insertSecondiAzione = new JTextField();
-			insertSecondiAzione.setBounds(50, 415, 160, 30);
+			insertSecondiAzione.setBounds(50, 475, 160, 30);
 			leftPanel.add(insertSecondiAzione);
 
 			JLabel labelSecondiKick = new JLabel("Secondi kick:");
 			labelSecondiKick.setFont(new Font("Arial", Font.PLAIN, 18));
 			labelSecondiKick.setForeground(Color.BLACK);
-			labelSecondiKick.setBounds(240, 380, 180, 30);
+			labelSecondiKick.setBounds(240, 440, 180, 30);
 			leftPanel.add(labelSecondiKick);
 
 			insertSecondiKick = new JTextField();
-			insertSecondiKick.setBounds(240, 415, 160, 30);
+			insertSecondiKick.setBounds(240, 475, 160, 30);
 			leftPanel.add(insertSecondiKick);
 
 			JButton inviaCreaStanza = new JButton("CREA LA STANZA");
-			inviaCreaStanza.setBounds(50, 470, larghezzaBottone, 40);
+			inviaCreaStanza.setBounds(50, 530, 180, 40);
+			inviaCreaStanza.setBackground(Color.WHITE);
 			inviaCreaStanza.addActionListener(e -> {
 				String nome = insertNome.getText().trim();
 				String pin = insertPin.getText().trim();
@@ -206,7 +202,6 @@ public class Client {
 				String secondiAzione = insertSecondiAzione.getText().trim();
 				String secondiKick = insertSecondiKick.getText().trim();
 
-				// campi vuoti
 				if (nome.isEmpty() || pin.isEmpty() || maxGiocatori.isEmpty() || secondiAzione.isEmpty() || secondiKick.isEmpty()) {
 					JOptionPane.showMessageDialog(finestra, "Compila tutti i campi");
 					return;
@@ -219,7 +214,6 @@ public class Client {
 					JOptionPane.showMessageDialog(finestra, "Il nome non può contenere '-'");
 					return;
 				}
-				// solo cifre
 				if (!isNum(pin) || !isNum(maxGiocatori) || !isNum(secondiAzione) || !isNum(secondiKick)) {
 					JOptionPane.showMessageDialog(finestra, "PIN, giocatori e secondi devono essere numeri");
 					return;
@@ -229,28 +223,79 @@ public class Client {
 					JOptionPane.showMessageDialog(finestra, "I giocatori devono essere da 2 a 30");
 					return;
 				}
-
-				// inviaAlServer( "CREA-" + nome + "-" + pin + "-" + max + "-" + viteSelezionate
-				// + "-" + secAz + "-" + secKick);
+				// inviaAlServer(...)
 			});
 			leftPanel.add(inviaCreaStanza);
 
-			// Configurazione pannello destro (rimane con il layout di default)
+
+			// --- CONFIGURAZIONE PANNELLO DESTRO (ENTRA IN UNA STANZA) ---
 			rightPanel = new JPanel();
+			rightPanel.setLayout(null); // Impostato a null per usare setBounds come a sinistra
 			rightPanel.setBackground(Color.decode("#1C6634"));
+
+			// Titolo principale Destro
 			JLabel labelEntraPartita = new JLabel("ENTRA IN UNA STANZA");
 			labelEntraPartita.setFont(new Font("Arial", Font.BOLD | Font.ITALIC, 40));
 			labelEntraPartita.setForeground(Color.BLACK);
+			labelEntraPartita.setBounds(50, 90, 450, 50);
 			rightPanel.add(labelEntraPartita);
+
+			// Nome Giocatore (Destra)
+			JLabel labelNomeDx = new JLabel("Nome Giocatore:");
+			labelNomeDx.setFont(new Font("Arial", Font.PLAIN, 18));
+			labelNomeDx.setForeground(Color.BLACK);
+			labelNomeDx.setBounds(50, 160, 200, 30);
+			rightPanel.add(labelNomeDx);
+
+			insertNomeEntra = new JTextField(); // Assicurati che sia dichiarata come variabile di classe
+			insertNomeEntra.setBounds(50, 195, 200, 30);
+			rightPanel.add(insertNomeEntra);
+
+			// PIN (Destra)
+			JLabel labelPinDx = new JLabel("Inserisci PIN Stanza:");
+			labelPinDx.setFont(new Font("Arial", Font.PLAIN, 18));
+			labelPinDx.setForeground(Color.BLACK);
+			labelPinDx.setBounds(50, 250, 200, 30);
+			rightPanel.add(labelPinDx);
+
+			insertPinEntra = new JTextField(); // Assicurati che sia dichiarata come variabile di classe
+			insertPinEntra.setBounds(50, 285, 200, 30);
+			rightPanel.add(insertPinEntra);
+
+			// Bottone Entra nella Stanza
+			JButton inviaEntraStanza = new JButton("ENTRA NELLA STANZA");
+			inviaEntraStanza.setBounds(50, 350, 200, 40);
+			inviaEntraStanza.setBackground(Color.WHITE);
+			inviaEntraStanza.addActionListener(e -> {
+				String nome = insertNomeEntra.getText().trim();
+				String pin = insertPinEntra.getText().trim();
+
+				if (nome.isEmpty() || pin.isEmpty()) {
+					JOptionPane.showMessageDialog(finestra, "Compila tutti i campi");
+					return;
+				}
+				if (nome.contains("-")) {
+					JOptionPane.showMessageDialog(finestra, "Il nome non può contenere '-'");
+					return;
+				}
+				if (!isNum(pin)) {
+					JOptionPane.showMessageDialog(finestra, "Il PIN deve essere un numero");
+					return;
+				}
+				// inviaAlServer( "ACCEDI-" + nome + "-" + pin );
+			});
+			rightPanel.add(inviaEntraStanza);
+
 
 			// Creazione del JSplitPane diviso orizzontalmente
 			splitPane = new JSplitPane(
 					JSplitPane.HORIZONTAL_SPLIT,
 					leftPanel,
 					rightPanel);
-			splitPane.setDividerLocation(500); // Posizione iniziale del divisore in pixel
-			splitPane.setDividerSize(3); // grandezza del divisore
+			splitPane.setDividerLocation(500); 
+			splitPane.setDividerSize(3); 
 
+			setBottoniBianchi(0); 
 			finestra.add(splitPane);
 			finestra.setVisible(true);
 		} catch (Exception e) {
@@ -258,6 +303,11 @@ public class Client {
 			System.out.println("Errore durante la comunicazione col server");
 			System.exit(1);
 		}
+	}
+
+	// ###### METODI AUSILIO MESSAGGIO SOCKET ######
+	public void inviaAlServer(){
+
 	}
 
 	// ###### METODI DI AUSILIO #######
