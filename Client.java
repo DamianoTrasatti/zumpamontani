@@ -32,7 +32,7 @@ public class Client {
 	JPanel leftPanel;
 	JPanel rightPanel;
 	JSplitPane splitPane;
-	JTextField insertNome, insertPin, insertMaxGiocatori, insertSecondiAzione, insertSecondiKick;
+	JTextField insertNomeCrea, insertPinCrea, insertMaxGiocatoriCrea, insertSecondiAzioneCrea, insertSecondiKickCrea;
 	JTextField insertNomeEntra, insertPinEntra;
 	JButton btnVite1, btnVite2, btnVite3, btnVite4, btnVite5;
 
@@ -71,9 +71,9 @@ public void creaInterfacciaCliente() {
 			labelNomeSx.setBounds(50, 65, 200, 30);
 			leftPanel.add(labelNomeSx);
 
-			insertNome = new JTextField();
-			insertNome.setBounds(50, 95, 200, 30);
-			leftPanel.add(insertNome);
+			insertNomeCrea = new JTextField();
+			insertNomeCrea.setBounds(50, 95, 200, 30);
+			leftPanel.add(insertNomeCrea);
 
 			// Label Titolo principale (spostato più in basso per fare spazio al nome)
 			JLabel labelCreaPartita = new JLabel("CREA UNA STANZA");
@@ -89,9 +89,9 @@ public void creaInterfacciaCliente() {
 			labelCreaPin.setBounds(50, 160, 200, 30);
 			leftPanel.add(labelCreaPin);
 
-			insertPin = new JTextField();
-			insertPin.setBounds(50, 195, 200, 30);
-			leftPanel.add(insertPin);
+			insertPinCrea = new JTextField();
+			insertPinCrea.setBounds(50, 195, 200, 30);
+			leftPanel.add(insertPinCrea);
 
 			// --- 2. SELEZIONA NUMERO VITE (coordinate Y aggiornate) ---
 			JLabel labelVite = new JLabel("Seleziona numero vite per giocatore:");
@@ -167,9 +167,9 @@ public void creaInterfacciaCliente() {
 			labelMaxGiocatori.setBounds(50, 350, 400, 30);
 			leftPanel.add(labelMaxGiocatori);
 
-			insertMaxGiocatori = new JTextField();
-			insertMaxGiocatori.setBounds(50, 385, 200, 30);
-			leftPanel.add(insertMaxGiocatori);
+			insertMaxGiocatoriCrea = new JTextField();
+			insertMaxGiocatoriCrea.setBounds(50, 385, 200, 30);
+			leftPanel.add(insertMaxGiocatoriCrea);
 
 			// --- 4. SECONDI AZIONE E SECONDI KICK (coordinate Y aggiornate) ---
 			JLabel labelSecondiAzione = new JLabel("Secondi azione:");
@@ -178,9 +178,9 @@ public void creaInterfacciaCliente() {
 			labelSecondiAzione.setBounds(50, 440, 180, 30);
 			leftPanel.add(labelSecondiAzione);
 
-			insertSecondiAzione = new JTextField();
-			insertSecondiAzione.setBounds(50, 475, 160, 30);
-			leftPanel.add(insertSecondiAzione);
+			insertSecondiAzioneCrea = new JTextField();
+			insertSecondiAzioneCrea.setBounds(50, 475, 160, 30);
+			leftPanel.add(insertSecondiAzioneCrea);
 
 			JLabel labelSecondiKick = new JLabel("Secondi kick:");
 			labelSecondiKick.setFont(new Font("Arial", Font.PLAIN, 18));
@@ -188,19 +188,19 @@ public void creaInterfacciaCliente() {
 			labelSecondiKick.setBounds(240, 440, 180, 30);
 			leftPanel.add(labelSecondiKick);
 
-			insertSecondiKick = new JTextField();
-			insertSecondiKick.setBounds(240, 475, 160, 30);
-			leftPanel.add(insertSecondiKick);
+			insertSecondiKickCrea = new JTextField();
+			insertSecondiKickCrea.setBounds(240, 475, 160, 30);
+			leftPanel.add(insertSecondiKickCrea);
 
 			JButton inviaCreaStanza = new JButton("CREA LA STANZA");
 			inviaCreaStanza.setBounds(50, 530, 180, 40);
 			inviaCreaStanza.setBackground(Color.WHITE);
 			inviaCreaStanza.addActionListener(e -> {
-				String nome = insertNome.getText().trim();
-				String pin = insertPin.getText().trim();
-				String maxGiocatori = insertMaxGiocatori.getText().trim();
-				String secondiAzione = insertSecondiAzione.getText().trim();
-				String secondiKick = insertSecondiKick.getText().trim();
+				String nome = insertNomeCrea.getText().trim();
+				String pin = insertPinCrea.getText().trim();
+				String maxGiocatori = insertMaxGiocatoriCrea.getText().trim();
+				String secondiAzione = insertSecondiAzioneCrea.getText().trim();
+				String secondiKick = insertSecondiKickCrea.getText().trim();
 
 				if (nome.isEmpty() || pin.isEmpty() || maxGiocatori.isEmpty() || secondiAzione.isEmpty() || secondiKick.isEmpty()) {
 					JOptionPane.showMessageDialog(finestra, "Compila tutti i campi");
@@ -282,7 +282,7 @@ public void creaInterfacciaCliente() {
 					JOptionPane.showMessageDialog(finestra, "Il PIN deve essere un numero");
 					return;
 				}
-				// inviaAlServer( "ACCEDI-" + nome + "-" + pin );
+				inviaAlServer("ENTRA-" + insertNomeEntra + "-" + insertPinEntra );
 			});
 			rightPanel.add(inviaEntraStanza);
 
@@ -306,7 +306,9 @@ public void creaInterfacciaCliente() {
 	}
 
 	// ###### METODI AUSILIO MESSAGGIO SOCKET ######
-	public void inviaAlServer(){
+
+    // inviare i dati al server
+	public void inviaAlServer(String testo){
 
 	}
 
