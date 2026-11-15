@@ -2,9 +2,17 @@
 //SERVER (multi-client, piu' stanze)
 import java.net.*;
 import java.io.*;
+import java.util.ArrayList;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class Server {
     ServerSocket serverSocket = null;
+
+    // lista UNICA di tutte le stanze, condivisa da tutti i thread dei client
+    public static ArrayList<Stanza> stanze = new ArrayList<>();
+
+    // mutex: prima di leggere o modificare "stanze" fare lock(), alla fine unlock()
+    public static ReentrantLock mutexStanze = new ReentrantLock(); // il mutex deve proteggere stanze, ogni thread non deve avere il suo, deve essere uno globale per tutti
 
     public void attendi() {
         try {

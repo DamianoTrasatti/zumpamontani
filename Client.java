@@ -223,7 +223,9 @@ public void creaInterfacciaCliente() {
 					JOptionPane.showMessageDialog(finestra, "I giocatori devono essere da 2 a 30");
 					return;
 				}
-				// inviaAlServer(...)
+				// stesso ordine che si aspetta il server: CREA-Nome-Pin-MaxGiocatori-Vite-SecondiAzione-SecondiKick
+				inviaAlServer("CREA-" + nome + "-" + pin + "-" + maxGiocatori + "-" + viteSelezionate + "-"
+						+ secondiAzione + "-" + secondiKick);
 			});
 			leftPanel.add(inviaCreaStanza);
 
@@ -282,7 +284,7 @@ public void creaInterfacciaCliente() {
 					JOptionPane.showMessageDialog(finestra, "Il PIN deve essere un numero");
 					return;
 				}
-				inviaAlServer("ENTRA-" + insertNomeEntra + "-" + insertPinEntra );
+				inviaAlServer("ENTRA-" + nome + "-" + pin);
 			});
 			rightPanel.add(inviaEntraStanza);
 
@@ -309,7 +311,20 @@ public void creaInterfacciaCliente() {
 
     // inviare i dati al server
 	public void inviaAlServer(String testo){
+		try{
+			// niente toUpperCase: il comando (CREA/ENTRA) e' gia' maiuscolo, il nome resta come l'ha scritto l'utente
+			outVersoServer.writeBytes(testo + "\n");
+			System.out.println("Inviato al server: " + testo);
+			riceviStato();
+			// implementare
+		} catch (Exception e) {
+			System.out.println("Errore: " +  e.getMessage());
+		}
+	}
 
+	// ricevere dati dal server
+	public void  riceviStato() {
+		
 	}
 
 	// ###### METODI DI AUSILIO #######
@@ -347,31 +362,9 @@ public void creaInterfacciaCliente() {
 			btnVite5.setBackground(Color.WHITE);
 	}
 
-	public void comunica() {
-		try {
-			stringaRicevutaDalServer = inDalServer.readLine();
-			System.out.println("...prima scritta dal server:" + '\n' + stringaRicevutaDalServer);
-
-			stringaUtente = tastiera.readLine();
-
-			System.out.println("...invio la stringa al server e attendo...");
-			outVersoServer.writeBytes(stringaUtente + '\n');
-
-			/*
-			 * System.out.println("...CLIENT termina eleborazione e chiude connessione");
-			 * miosocket.close();
-			 */
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			System.out.println("Errore durante la comunicazione col server");
-			System.exit(1);
-		}
-	}
-
 	public static void main(String[] args) {
 		Client cliente = new Client();
 		cliente.connetti();
 		cliente.creaInterfacciaCliente();
-		cliente.comunica();
 	}
 }
