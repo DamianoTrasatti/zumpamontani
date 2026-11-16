@@ -324,7 +324,26 @@ public void creaInterfacciaCliente() {
 
 	// ricevere dati dal server
 	public void  riceviStato() {
-		
+		try {
+			stringaRicevutaDalServer = inDalServer.readLine();
+			System.out.println("in dal server: " + stringaRicevutaDalServer);
+			String[] p = stringaRicevutaDalServer.split("-");
+			String comando = p[0];
+			if (comando.equals("ERRORE")) {
+				miosocket.close();
+			} else if (comando.equals("OK")) {
+				finestra.dispose(); // chiude la finestra di scelta
+				finestra = new JFrame("Zompa Montani client - Stanza di attesa");
+				finestra.setSize(1000, 800);
+				finestra.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+			} else {
+				miosocket.close();
+			}
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+			System.out.println("Errore durante la comunicazione col server");
+			System.exit(1);
+		}
 	}
 
 	// ###### METODI DI AUSILIO #######
