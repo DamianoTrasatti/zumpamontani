@@ -307,6 +307,26 @@ public void creaInterfacciaCliente() {
 		}
 	}
 
+		// ###### SECONDA PARTE: STANZA DI ATTESA ######
+	public void creaStanzaDiAttesa(String messaggio) {
+		finestra = new JFrame("Zompa Montani client - Stanza di attesa");
+		finestra.setSize(1000, 800);
+		finestra.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+		JPanel pannelloAttesa = new JPanel();
+		pannelloAttesa.setLayout(null);
+		pannelloAttesa.setBackground(Color.decode("#1C6634"));
+
+		JLabel labelAttesa = new JLabel(messaggio + " - in attesa degli altri giocatori...");
+		labelAttesa.setFont(new Font("Arial", Font.BOLD, 28));
+		labelAttesa.setForeground(Color.BLACK);
+		labelAttesa.setBounds(50, 50, 900, 50);
+		pannelloAttesa.add(labelAttesa);
+
+		finestra.add(pannelloAttesa);
+		finestra.setVisible(true); // SENZA QUESTO la finestra non appare e il programma termina
+	}
+
 	// ###### METODI AUSILIO MESSAGGIO SOCKET ######
 
     // inviare i dati al server
@@ -329,13 +349,12 @@ public void creaInterfacciaCliente() {
 			System.out.println("in dal server: " + stringaRicevutaDalServer);
 			String[] p = stringaRicevutaDalServer.split("-");
 			String comando = p[0];
+			String messaggio = p[1];
 			if (comando.equals("ERRORE")) {
 				miosocket.close();
 			} else if (comando.equals("OK")) {
 				finestra.dispose(); // chiude la finestra di scelta
-				finestra = new JFrame("Zompa Montani client - Stanza di attesa");
-				finestra.setSize(1000, 800);
-				finestra.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+				creaStanzaDiAttesa(messaggio);
 			} else {
 				miosocket.close();
 			}
