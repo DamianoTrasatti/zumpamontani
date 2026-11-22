@@ -51,7 +51,24 @@ public class GestioneServerDelClientThread extends Thread {
                         risposta = "ERRORE-Comando sconosciuto";
                         break;
                 }
-                outVersoClient.writeBytes(risposta + "\n");
+                // in caso di successo lo scrivo da dentro crea/entra stanza perche ce il mutex
+                // esmepio di problema: dovrebbe arrivare ok ma un giocatore scrive agli altri la lista aggiornata. problemi se legge la lista e non ok si blocca e non si crea la schermata
+                if (risposta.split("-")[0].equals("ERRORE")) {
+                    outVersoClient.writeBytes(risposta + "\n");
+                }
+            }
+
+            do {
+                // il client ora è nella stanza di attesa: gli mandiamo i giocatori presenti
+                // (nome del giocatore) e li scriviamo lato client
+                // outversoilserver("SALA DI ATTESA-nomegiocatore1-...-numerototalegiocatori")
+                // dobbiamo anche stare a sentire i messaggi che arrivano dal client (un client
+                // che esce o il creatore della partita che la avvia)
+            } while (stanza.getIsPlaying() == false); // finche non inizia la partita
+
+            // partita vera e propria iniziata, finche non finisce:
+            while (stanza.getIsPlaying() == true) {
+
             }
 
         } catch (Exception e) {
@@ -64,6 +81,16 @@ public class GestioneServerDelClientThread extends Thread {
             }
         }
 
+    }
+
+    private void broadcastMessage(String message) {
+        Server.mutexStanze.lock();
+        try {
+            for (Giocatore g : stanza.getGiocatoriStanza())
+                g.invia(message);
+        } finally {
+            Server.mutexStanze.unlock();
+        }
     }
 
     // cerca la stanza con quel pin, null se non esiste
@@ -102,13 +129,14 @@ public class GestioneServerDelClientThread extends Thread {
             // attenzione all'ordine: il costruttore vuole (pin, vite, maxGiocatori, ...)
             Stanza nuova = new Stanza(pin, vite, maxGiocatori, secondiAzione, secondiKick);
             // il creatore e' il primo giocatore, la carta arriva quando si distribuisce
-            Giocatore creatore = new Giocatore(nome, 1, vite, null);
+            Giocatore creatore = new Giocatore(nome, 1, vite, outVersoClient, null);
             nuova.getGiocatoriStanza().add(creatore);
             Server.stanze.add(nuova);
 
             stanza = nuova;
             giocatore = creatore;
             System.out.println(nome + " ha creato la stanza " + pin);
+            giocatore.invia("OK-Stanza creata"); // mandato mentre ho ancora mutexStanze
             return "OK-Stanza creata";
         } finally {
             Server.mutexStanze.unlock(); // eseguito sempre, anche dopo i return
@@ -137,7 +165,7 @@ public class GestioneServerDelClientThread extends Thread {
             if (s.getIsPlaying()) {
                 return "ERRORE-La partita e gia iniziata";
             }
-            if (s.getGiocatoriStanza().size() >= s.getMaxGiocatori()) {
+            if (s.getNumGiocatoriStanza() >= s.getMaxNumGiocatori()) {
                 return "ERRORE-La stanza e piena";
             }
             for (Giocatore g : s.getGiocatoriStanza()) {
@@ -147,12 +175,18 @@ public class GestioneServerDelClientThread extends Thread {
                 }
             }
             // il nuovo giocatore va in fondo: indice = numero giocatori + 1
-            Giocatore nuovo = new Giocatore(nome, s.getGiocatoriStanza().size() + 1, s.getViteIniziali(), null);
-            s.getGiocatoriStanza().add(nuovo);
+            Giocatore nuovo = new Giocatore(nome, s.getGiocatoriStanza().size() + 1, s.getViteIniziali(),
+                    outVersoClient, null);
+            s.getGiocatoriStanza().add(nuovo); // lo aggiungo all'array list
 
             stanza = s;
             giocatore = nuovo;
             System.out.println(nome + " e entrato nella stanza " + pin);
+            // se il numero di giocatori della stanza attualmente è uguale al numero massimo
+            // di giocatori allora inizio la partita
+            if (stanza.getNumGiocatoriStanza() == stanza.getMaxNumGiocatori())
+                stanza.setIsPLaying(true);
+            giocatore.invia("OK-Sei entrato nella stanza");
             return "OK-Sei entrato nella stanza";
         } finally {
             Server.mutexStanze.unlock(); // eseguito sempre, anche dopo i return

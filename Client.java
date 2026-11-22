@@ -27,7 +27,6 @@ public class Client {
 	int viteSelezionate = 0;
 
 	// ###### ATTRIBUTI PANNELLO + JFRAME (prima parte [scelta entra o crea stanza])
-	// ######
 	JFrame finestra;
 	JPanel leftPanel;
 	JPanel rightPanel;
@@ -35,6 +34,14 @@ public class Client {
 	JTextField insertNomeCrea, insertPinCrea, insertMaxGiocatoriCrea, insertSecondiAzioneCrea, insertSecondiKickCrea;
 	JTextField insertNomeEntra, insertPinEntra;
 	JButton btnVite1, btnVite2, btnVite3, btnVite4, btnVite5;
+
+	// ###### ATTRIBTI GIOCATORE #####
+	boolean creatore = false;
+
+	// ###### ATTRIBUTI STANZA DI ATTESA ######
+	// attributo (non variabile locale) cosi' si potra' attivare anche dopo,
+	// quando il creatore esce e il server sceglie il nuovo creatore
+	JButton btnAvviaPartita;
 
 	public Socket connetti() {
 		System.out.println("2 UN CLIENT partito in esecuzione");
@@ -53,7 +60,7 @@ public class Client {
 		return miosocket;
 	}
 
-public void creaInterfacciaCliente() {
+	public void creaInterfacciaCliente() {
 		try {
 			finestra = new JFrame("Zompa Montani client - Entra o Crea stanza");
 			finestra.setSize(1000, 800);
@@ -202,7 +209,8 @@ public void creaInterfacciaCliente() {
 				String secondiAzione = insertSecondiAzioneCrea.getText().trim();
 				String secondiKick = insertSecondiKickCrea.getText().trim();
 
-				if (nome.isEmpty() || pin.isEmpty() || maxGiocatori.isEmpty() || secondiAzione.isEmpty() || secondiKick.isEmpty()) {
+				if (nome.isEmpty() || pin.isEmpty() || maxGiocatori.isEmpty() || secondiAzione.isEmpty()
+						|| secondiKick.isEmpty()) {
 					JOptionPane.showMessageDialog(finestra, "Compila tutti i campi");
 					return;
 				}
@@ -223,12 +231,12 @@ public void creaInterfacciaCliente() {
 					JOptionPane.showMessageDialog(finestra, "I giocatori devono essere da 2 a 30");
 					return;
 				}
-				// stesso ordine che si aspetta il server: CREA-Nome-Pin-MaxGiocatori-Vite-SecondiAzione-SecondiKick
+				// stesso ordine che si aspetta il server:
+				// CREA-Nome-Pin-MaxGiocatori-Vite-SecondiAzione-SecondiKick
 				inviaAlServer("CREA-" + nome + "-" + pin + "-" + maxGiocatori + "-" + viteSelezionate + "-"
 						+ secondiAzione + "-" + secondiKick);
 			});
 			leftPanel.add(inviaCreaStanza);
-
 
 			// --- CONFIGURAZIONE PANNELLO DESTRO (ENTRA IN UNA STANZA) ---
 			rightPanel = new JPanel();
@@ -288,16 +296,15 @@ public void creaInterfacciaCliente() {
 			});
 			rightPanel.add(inviaEntraStanza);
 
-
 			// Creazione del JSplitPane diviso orizzontalmente
 			splitPane = new JSplitPane(
 					JSplitPane.HORIZONTAL_SPLIT,
 					leftPanel,
 					rightPanel);
-			splitPane.setDividerLocation(500); 
-			splitPane.setDividerSize(3); 
+			splitPane.setDividerLocation(500);
+			splitPane.setDividerSize(3);
 
-			setBottoniBianchi(0); 
+			setBottoniBianchi(0);
 			finestra.add(splitPane);
 			finestra.setVisible(true);
 		} catch (Exception e) {
@@ -307,24 +314,88 @@ public void creaInterfacciaCliente() {
 		}
 	}
 
+	// ###### SECONDA PARTE: STANZA DI ATTESA ######
+	public void creaStanzaDiAttesa(String messaggio) {
+		finestra = new JFrame("Zompa Montani client - Stanza di attesa");
+		finestra.setSize(1000, 800);
+		finestra.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+		JPanel pannelloAttesa = new JPanel();
+		pannelloAttesa.setLayout(null);
+		pannelloAttesa.setBackground(Color.decode("#1C6634"));
+
+		JLabel labelAttesa = new JLabel(messaggio + " - in attesa degli altri giocatori...");
+		labelAttesa.setFont(new Font("Arial", Font.BOLD, 28));
+		labelAttesa.setForeground(Color.BLACK);
+		labelAttesa.setBounds(50, 50, 900, 50);
+		pannelloAttesa.add(labelAttesa);
+
+		// bottone AVVIA PARTITA: lo vedono tutti, ma e' attivo solo per il creatore
+		btnAvviaPartita = new JButton(creatore ? "AVVIA PARTITA" : "RISERVATO AL CREATORE");
+		btnAvviaPartita.setFont(new Font("Arial", Font.BOLD, 20));
+		btnAvviaPartita.setBounds(50, 600, 250, 50);
+		btnAvviaPartita.setBackground(Color.WHITE);
+		btnAvviaPartita.setEnabled(creatore); // true -> cliccabile, false -> grigio e non cliccabile
+		btnAvviaPartita.addActionListener(e -> {
+			try {
+				// solo invio, NON chiamo inviaAlServer: quello poi resta fermo ad aspettare
+				// la risposta (riceviStato) e bloccherebbe la finestra.
+				// la risposta (INIZIO o ERRORE) la leggera' il thread in ascolto, da fare
+				outVersoServer.writeBytes("AVVIA" + "\n");
+				System.out.println("Inviato al server: AVVIA");
+				btnAvviaPartita.setEnabled(false); // evita di premerlo due volte
+			} catch (Exception ex) {
+				System.out.println("Errore: " + ex.getMessage());
+			}
+		});
+		pannelloAttesa.add(btnAvviaPartita);
+
+		finestra.add(pannelloAttesa);
+		finestra.setVisible(true); // SENZA QUESTO la finestra non appare e il programma termina
+	}
+
 	// ###### METODI AUSILIO MESSAGGIO SOCKET ######
 
-    // inviare i dati al server
-	public void inviaAlServer(String testo){
-		try{
-			// niente toUpperCase: il comando (CREA/ENTRA) e' gia' maiuscolo, il nome resta come l'ha scritto l'utente
+	// inviare i dati al server
+	public void inviaAlServer(String testo) {
+		try {
+			// niente toUpperCase: il comando (CREA/ENTRA) e' gia' maiuscolo, il nome resta
+			// come l'ha scritto l'utente
 			outVersoServer.writeBytes(testo + "\n");
 			System.out.println("Inviato al server: " + testo);
 			riceviStato();
 			// implementare
 		} catch (Exception e) {
-			System.out.println("Errore: " +  e.getMessage());
+			System.out.println("Errore: " + e.getMessage());
 		}
 	}
 
 	// ricevere dati dal server
-	public void  riceviStato() {
-		
+	public void riceviStato() {
+		try {
+			stringaRicevutaDalServer = inDalServer.readLine();
+			System.out.println("in dal server: " + stringaRicevutaDalServer);
+			String[] p = stringaRicevutaDalServer.split("-");
+			String comando = p[0];
+			String messaggio = p[1];
+			if (comando.equals("ERRORE")) {
+				// il socket resta aperto: mostro l'errore e l'utente corregge e riprova
+				JOptionPane.showMessageDialog(finestra, messaggio, "Errore", JOptionPane.ERROR_MESSAGE);
+			} else if (comando.equals("OK")) {
+				finestra.dispose(); // chiude la finestra di scelta
+				if (messaggio.equals("Stanza creata"))
+					creatore = true;
+				System.out.println("creatore: " + creatore);
+				creaStanzaDiAttesa(messaggio);
+			} else {
+				JOptionPane.showMessageDialog(finestra, "Risposta sconosciuta dal server: " + stringaRicevutaDalServer,
+						"Errore", JOptionPane.ERROR_MESSAGE);
+			}
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+			System.out.println("Errore durante la comunicazione col server");
+			System.exit(1);
+		}
 	}
 
 	// ###### METODI DI AUSILIO #######

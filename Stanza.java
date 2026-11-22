@@ -35,7 +35,7 @@ public class Stanza {
         return viteIniziali;
     }
 
-    public int getMaxGiocatori() {
+    public int getMaxNumGiocatori() {
         return maxGiocatori;
     }
 
@@ -57,6 +57,10 @@ public class Stanza {
 
     public ArrayList<Giocatore> getGiocatoriStanza() {
         return giocatoriStanza;
+    }
+
+    public int getNumGiocatoriStanza() {
+        return giocatoriStanza.size(); // size() conta gia' tutti gli elementi (indice 0 compreso)
     }
 
     public ArrayList<Carta> getMazzo() {

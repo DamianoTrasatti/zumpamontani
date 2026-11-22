@@ -1,16 +1,37 @@
+import java.beans.Expression;
+import java.io.DataOutputStream;
+import java.util.concurrent.locks.ReentrantLock;
+
 public class Giocatore {
     private String nome;
     private int indice; // posizione nell'ordine di gioco
     private int vite;
-    private boolean eliminato;
+    private DataOutputStream canaleOutVersoClient;
     private Carta cartaGiocatore;
 
-    public Giocatore(String nome, int indice, int vite, Carta cartaGiocatore) {
+    private boolean eliminato = false; // all'inizio nessuno è eliminato
+
+    // devo mettere il lock per quando invio da questo canaleoutversoclient perche
+    // poterebbero farlo piu giocatori contemporaneamete
+    public ReentrantLock mutexGiocatori = new ReentrantLock();
+
+    public Giocatore(String nome, int indice, int vite, DataOutputStream canaleOutVersoClient, Carta cartaGiocatore) {
         this.nome = nome;
         this.indice = indice;
         this.vite = vite;
-        this.eliminato = false; // all'inizio nessuno e' eliminato
+        this.canaleOutVersoClient = canaleOutVersoClient;
         this.cartaGiocatore = cartaGiocatore;
+    }
+
+    public void invia(String message) {
+        mutexGiocatori.lock();
+        try {
+            canaleOutVersoClient.writeBytes(message + "\n");
+        } catch (Exception e) {
+            System.out.println("Errore: " + e.getMessage());
+        } finally {
+            mutexGiocatori.unlock();
+        }
     }
 
     // ###### GET ######
@@ -32,6 +53,10 @@ public class Giocatore {
 
     public Carta getCartaGiocatore() {
         return cartaGiocatore;
+    }
+
+    public DataOutputStream getCanaleOutVersoClient() {
+        return canaleOutVersoClient;
     }
 
     // ###### SET ######
