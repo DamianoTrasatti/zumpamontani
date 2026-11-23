@@ -2,7 +2,6 @@ public class Carta {
     private int numero; // 1..10
     private String seme; // sempre "Denari", "Spade", "Coppe" o "Bastoni"
     private String percorso_immagine;
-    private int punteggioCarta; // denari = *4, spade = *3, coppe = *2, bastoni = *1
 
     public Carta(int numero, String seme) {
         cambiaCarta(numero, seme);
@@ -13,7 +12,6 @@ public class Carta {
         this.numero = numero;
         this.seme = seme;
         this.percorso_immagine = calcolaPercorso(this.numero, this.seme);
-        this.punteggioCarta = calcolaPunteggio(this.numero, this.seme);
     }
 
     // es. 1 Bastoni -> image/Bastoni01.png
@@ -24,6 +22,7 @@ public class Carta {
     }
 
     // punteggio = numero * moltiplicatore del seme
+    /*
     private int calcolaPunteggio(int numero, String seme) {
         int moltiplicatore = 0; // il compilatore richiede un valore iniziale
         switch (seme) {
@@ -42,6 +41,7 @@ public class Carta {
         }
         return numero * moltiplicatore;
     }
+    */
 
     // ###### GET ######
     public int getNumero() {
@@ -56,27 +56,14 @@ public class Carta {
         return percorso_immagine;
     }
 
-    public int getPunteggioCarta() {
-        return punteggioCarta;
-    }
-
     // ###### SET ######
     // cambiando numero o seme il punteggio viene ricalcolato
     public void setNumero(int numero) {
         this.numero = numero;
-        this.punteggioCarta = calcolaPunteggio(this.numero, this.seme);
-    }
-
-    public void setSeme(String seme) {
-        this.seme = seme;
-        this.punteggioCarta = calcolaPunteggio(this.numero, this.seme);
     }
 
     public void setPercorso_immagine(String percorso_immagine) {
         this.percorso_immagine = percorso_immagine;
     }
 
-    public void setPunteggioCarta(int punteggioCarta) {
-        this.punteggioCarta = punteggioCarta;
-    }
 }

@@ -58,6 +58,15 @@ public class GestioneServerDelClientThread extends Thread {
                 }
             }
 
+            // ogni volta che il server riceve un messaggio dal client lo manda a tutti gli altri giocatori della stanza
+            // anche al giocatore che lo ha mandato perche per la sala d'attesa deve dirgli i gicotori presenti  
+            // thread che rimane in ascolto finche la partita non inizia e poi finche non finisce
+            // e poi scrive al client i messaggi che arrivano dagli altri giocatori della stanza
+            // messaggio per la sala di attesa: SALA DI ATTESA-nomegiocatore1-...-numerototalegiocatori
+            getNomeGiocatoriStanza();
+            broadcastMessage("SALA DI ATTESA-" + "NOMI GIOCATORI" + "-" + stanza.getNumGiocatoriStanza());
+            
+            
             do {
                 // il client ora è nella stanza di attesa: gli mandiamo i giocatori presenti
                 // (nome del giocatore) e li scriviamo lato client
@@ -83,6 +92,7 @@ public class GestioneServerDelClientThread extends Thread {
 
     }
 
+    // manda un messaggio a tutti i giocatori della stanza ma devo escludere, per la partita, il giocatore che ha mandato il messaggio (perche' lui lo sa gia') e al giocatore che tocca muovere gli devo mandare un altro messaggio che dica che deve muovere lui
     private void broadcastMessage(String message) {
         Server.mutexStanze.lock();
         try {
@@ -92,6 +102,8 @@ public class GestioneServerDelClientThread extends Thread {
             Server.mutexStanze.unlock();
         }
     }
+
+    
 
     // cerca la stanza con quel pin, null se non esiste
     // ATTENZIONE: chiamarlo solo quando si ha gia' il lock di Server.mutexStanze
