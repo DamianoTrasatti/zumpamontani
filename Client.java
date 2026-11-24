@@ -391,6 +391,10 @@ public class Client {
 				JOptionPane.showMessageDialog(finestra, "Risposta sconosciuta dal server: " + stringaRicevutaDalServer,
 						"Errore", JOptionPane.ERROR_MESSAGE);
 			}
+
+			// se leggo PARTITA AVVIATA allora creo la schermata della partita new jframe(Zompa montani gioco) e chiudo la finestra di attesa .dispose
+			// 
+
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			System.out.println("Errore durante la comunicazione col server");

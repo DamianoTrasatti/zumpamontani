@@ -63,10 +63,14 @@ public class GestioneServerDelClientThread extends Thread {
             // thread che rimane in ascolto finche la partita non inizia e poi finche non finisce
             // e poi scrive al client i messaggi che arrivano dagli altri giocatori della stanza
             // messaggio per la sala di attesa: SALA DI ATTESA-nomegiocatore1-...-numerototalegiocatori
-            getNomeGiocatoriStanza();
-            broadcastMessage("SALA DI ATTESA-" + "NOMI GIOCATORI" + "-" + stanza.getNumGiocatoriStanza());
+            String nomiGiocatori = "";
+            for (Giocatore g : stanza.getGiocatoriStanza())
+                nomiGiocatori += g.getNome();
             
+            broadcastMessage("SALA DI ATTESA-" + nomiGiocatori + "-" + stanza.getNumGiocatoriStanza());
+            // se il thread legge il messaggio di avvio partita allora mandiamo in broadcast PARTITA AVVIATA a tutti i giocatori
             
+
             do {
                 // il client ora è nella stanza di attesa: gli mandiamo i giocatori presenti
                 // (nome del giocatore) e li scriviamo lato client
