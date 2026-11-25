@@ -222,6 +222,10 @@ public class Client {
 					JOptionPane.showMessageDialog(finestra, "Il nome non può contenere '-'");
 					return;
 				}
+				if (nome.contains(";")) {
+					JOptionPane.showMessageDialog(finestra, "Il nome non può contenere ';'");
+					return;
+				}
 				if (!isNum(pin) || !isNum(maxGiocatori) || !isNum(secondiAzione) || !isNum(secondiKick)) {
 					JOptionPane.showMessageDialog(finestra, "PIN, giocatori e secondi devono essere numeri");
 					return;
